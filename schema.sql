@@ -72,3 +72,85 @@ CREATE TABLE admins (
 -- Password below is bcrypt hash of "Admin@123" (verify with PHP password_verify)
 INSERT INTO admins (name, username, password) VALUES
 ('Aman', 'admin', '$2b$12$ONu5B5flyQBmKBuobeO.3uza0JR3x/zw2ohVdbTTYv.mGOi1zGdfS');
+select * from verify;
+
+-- Transfer requests (department/role change requests from users)
+CREATE TABLE transfer_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    current_department VARCHAR(50) NOT NULL,
+    current_role VARCHAR(20) NOT NULL,
+    requested_department VARCHAR(50) NOT NULL,
+    requested_role VARCHAR(20) NOT NULL,
+    reason VARCHAR(500) NOT NULL,
+    status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+    requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    decided_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+ALTER TABLE users ADD COLUMN hide_email TINYINT(1) NOT NULL DEFAULT 0 AFTER hide_contact;
+ALTER TABLE users ADD COLUMN last_phone_change DATETIME DEFAULT NULL AFTER phone;
+ALTER TABLE users ADD COLUMN last_email_change DATETIME DEFAULT NULL AFTER email;
+
+-- Records every profile change a user makes to their own contact info/visibility
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    field_changed VARCHAR(50) NOT NULL,
+    old_value VARCHAR(255),
+    new_value VARCHAR(255),
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE contact_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    requester_id INT NOT NULL,
+    target_id INT NOT NULL,
+    reason VARCHAR(500) NOT NULL,
+    status ENUM('pending','approved','declined') NOT NULL DEFAULT 'pending',
+    shared_field ENUM('phone','email','both') DEFAULT NULL,
+    requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    decided_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (requester_id) REFERENCES users(id),
+    FOREIGN KEY (target_id) REFERENCES users(id)
+);
+select * from contact_requests;
+CREATE TABLE chat_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_key VARCHAR(50) NOT NULL,       -- 'it', 'hr', 'finance', 'sales', 'operations', 'marketing', 'general'
+    user_id INT NOT NULL,
+    message VARCHAR(1000) DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE announcement_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_key VARCHAR(50) NOT NULL,       -- 'it_announcements', 'hr_announcements', ..., 'announcement' (all-depts)
+    user_id INT NOT NULL,
+    message VARCHAR(1000) DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    pdf_path VARCHAR(255) DEFAULT NULL,   -- only ever populated when sender's role = 'senior'
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+	CREATE TABLE message_reports (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    message_id INT NOT NULL,
+    message_type ENUM('chat','announcement') NOT NULL,
+    room_key VARCHAR(50) NOT NULL,
+    reporter_id INT NOT NULL,
+    reported_user_id INT NOT NULL,
+    message_text VARCHAR(1000) DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    pdf_path VARCHAR(255) DEFAULT NULL,
+    reason VARCHAR(500) NOT NULL,
+    status ENUM('open','resolved','dismissed') NOT NULL DEFAULT 'open',
+    reported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    decided_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (reporter_id) REFERENCES users(id),
+    FOREIGN KEY (reported_user_id) REFERENCES users(id)
+);
+use blazeplus;
