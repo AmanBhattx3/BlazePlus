@@ -3,7 +3,7 @@
 // Update these to match your local MySQL setup
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '1234');
+define('DB_PASS', '');
 define('DB_NAME', 'blazeplus');
 
 // How long a submitted verify.php request waits before auto-delete
