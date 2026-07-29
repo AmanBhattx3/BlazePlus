@@ -1,0 +1,13 @@
+# Local config with real DB credentials — never commit this
+config.php
+
+# User-uploaded content at runtime
+uploads/chat/*
+!uploads/chat/.gitkeep
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
