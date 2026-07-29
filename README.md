@@ -4,16 +4,39 @@ Internal employee directory with admin-gated signup, department chat room placeh
 
 ## Setup
 
-1. Import the schema:
+1. Clone the repo:
+   ```
+   git clone https://github.com/AmanBhattx3/BlazePlus.git
+   cd BlazePlus
+   ```
+2. Import the schema:
    ```
    mysql -u root -p < schema.sql
    ```
-2. Open `config.php` and set your DB credentials (default assumes `root` / no password / `localhost`).
-3. Point your local PHP server at this folder, e.g.:
+3. Copy the config template and fill in your own DB credentials:
+   ```
+   cp config.example.php config.php
+   ```
+   Then open `config.php` and set `DB_HOST`, `DB_USER`, `DB_PASS`, and `DB_NAME` to match your local MySQL setup. `config.php` is gitignored, so your credentials stay local and are never pushed.
+4. Point your local PHP server at this folder, e.g.:
    ```
    php -S localhost:8000
    ```
-4. Visit `http://localhost:8000/signup.php`
+5. Visit `http://localhost:8000/signup.php`
+
+## Project structure
+
+```
+blazeplus/
+├── admin/                  # Admin dashboard, login, accept/reject actions
+├── assets/css/              # Stylesheet
+├── uploads/chat/             # Runtime chat image uploads (gitignored)
+├── config.example.php       # Template — copy to config.php and fill in your DB creds
+├── config.php                # Your local DB config (gitignored, not in repo)
+├── schema.sql                # Database schema + seed data
+├── .gitignore
+└── README.md
+```
 
 ## Flow
 
